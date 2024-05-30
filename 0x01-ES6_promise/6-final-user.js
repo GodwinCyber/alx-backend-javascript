@@ -7,6 +7,6 @@ export default async function handleProfileSignup(firstName, lastName, fileName)
     uploadPhoto(fileName),
   ]).then((results) => results.map((result) => ({
     status: result.status,
-    value: result.reason || result.value,
+    value: result.status === 'fulfiled' ? result.value : String(result.value),
   })));
 }
