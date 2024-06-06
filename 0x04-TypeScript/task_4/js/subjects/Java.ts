@@ -11,7 +11,7 @@ namespace Subjects {
     experienceTeachingJava?: number;
   }
   export class Java extends Subjects.Subject {
-    getRequirement(): string {
+    getRequirements(): string {
       return 'Here is the list of the requirement for java';
     }
     getAvailableTeacher(): string {

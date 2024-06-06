@@ -14,7 +14,7 @@ namespace Subjects {
     experienceTeachingC?: number; // added optional attribute
     }
     export class Cpp extends Subjects.Subject {
-      getRequirement(): string {
+      getRequirements(): string {
         return "Here is the list of requirements for Cpp";
     }
     getAvailableTeacher(): string {
