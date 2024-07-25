@@ -10,45 +10,28 @@
 // CSV file can contain empty lines (at the end) - and they are not a valid student!
 
 const http = require('http');
-const path = require('path');
-const countStudents = require('./3-read_file_async');
-
+const students = require('./3-read_file_async');
+const hostname = '127.0.0.1';
 const port = 1245;
 
-const app = http.createServer((req, resp) => {
-  resp.setHeader('Content-Type', 'text/plain');
-
+const app = http.createServer((req, res) => {
+  res.statusCode = 200;
+  res.setHeader('Content-Type', 'text/plain');
   if (req.url === '/') {
-    resp.writeHead(200);
-    resp.end('Hello Holberton School!');
+    res.end('Hello Holberton School!');
   } else if (req.url === '/students') {
-    const databaseFile = process.argv[2];
-    if (!databaseFile) {
-      resp.writeHead(500);
-      resp.end('Error: Database file path must be provided as an argument');
-      return;
-    }
-
-    const databasePath = path.join(__dirname, process.argv[2]);
-
-    countStudents(databasePath)
-      .then((output) => {
-        resp.writeHead(200);
-        resp.write('This is the list of our students\n');
-        resp.end(output);
-      })
-      .catch((err) => {
-        resp.writeHead(500);
-        resp.end(`Error: ${err.message}`);
-      });
-  } else {
-    resp.writeHead(404);
-    resp.end('Not found');
+    res.write('This is the list of our students\n');
+    students(process.argv[2]).then((data) => {
+      res.write(`Number of students: ${data.students.length}\n`);
+      res.write(`Number of students in CS: ${data.csStudents.length}. List: ${data.csStudents.join(', ')}\n`);
+      res.write(`Number of students in SWE: ${data.sweStudents.length}. List: ${data.sweStudents.join(', ')}`);
+      res.end();
+    }).catch((err) => res.end(err.message));
   }
 });
-
-app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
+  
+app.listen(port, hostname, () => {
+  console.log(`Server running at http://${hostname}:${port}`);
 });
 
 module.exports = app;
