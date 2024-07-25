@@ -17,22 +17,24 @@ const app = express();
 const port = 1245;
 
 app.get('/', (req, res) => {
-  res.statusCode = 200;
-  res.setHeader('Content-Type', 'plain/text');
+  res.status(200).set('Content-Type', 'text/plain');
   res.send('Hello Holberton School!');
 });
 app.get('/students', (req, res) => {
+  if (!process.argv[2]) {
+    res.status(500).send('Error: Database file path must be provided as argumnt');
+    return;
+  }
   const databasePath = path.join(__dirname, process.argv[2]);
   countStudents(databasePath)
     .then((output) => {
       const responseMessage = `This is the list of the students\n${output}`;
-      res.setHeader('Content-Type', 'plain/text');
-      res.statusCode = 200;
+      res.status(200).set('Content-Type', 'text/plain');
       res.send(responseMessage);
     })
     .catch((err) => {
       res.setHeader('Content-Type', 'text/plain');
-      res.statusCode = 500;
+      res.statu(500).set('Content-Type', 'text/plain');
       res.send(`Error: ${err.message}`);
     });
 });
