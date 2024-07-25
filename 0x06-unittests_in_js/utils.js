@@ -6,7 +6,7 @@ const Utils = {
         const roundedB = Math.round(b);
 
         if (type === 'SUM') {
-            return roundedA + roundedA;
+            return roundedA + roundedB;
         }
         if (type === 'SUBTRACT') {
             return roundedA - roundedB;

@@ -13,7 +13,7 @@ describe('sendPaymentRequestToApi', () => {
     it('should log the correct total', () => {
         const consoleLogSpy = sinon.spy(console, 'log');
         sendPaymentRequestToApi(100, 20);
-        expect(consoleLogSpy.calledOnceWithExactly('The total is: 120')).to.be.false;
+        expect(consoleLogSpy.calledOnceWithExactly('The total is: 120')).to.be.true;
         consoleLogSpy.restore();
     });
 });
