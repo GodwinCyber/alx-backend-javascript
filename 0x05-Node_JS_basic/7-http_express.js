@@ -10,35 +10,38 @@
 // CSV file can contain empty lines (at the end) - and they are not a valid student!
 
 const express = require('express');
-const path = require('path');
 const countStudents = require('./3-read_file_async');
 
 const app = express();
 const port = 1245;
 
 app.get('/', (req, res) => {
-  res.status(200).set('Content-Type', 'text/plain');
   res.send('Hello Holberton School!');
 });
+
 app.get('/students', (req, res) => {
-  if (!process.argv[2]) {
-    res.status(500).send('Error: Database file path must be provided as argumnt');
+  const databaseFile = process.argv[2];
+
+  if (!databaseFile) {
+    res.status(500).send('Error: Database file path must be provided as an argument');
     return;
   }
-  const databasePath = path.join(__dirname, process.argv[2]);
-  countStudents(databasePath)
-    .then((output) => {
-      const responseMessage = `This is the list of the students\n${output}`;
-      res.status(200).set('Content-Type', 'text/plain');
-      res.send(responseMessage);
+
+  countStudents(databaseFile)
+    .then((data) => {
+      res.write('This is the list of our students\n');
+      res.write(`Number of students: ${data.students.length}\n`);
+      res.write(`Number of students in CS: ${data.csStudents.length}. List: ${data.csStudents.join(', ')}\n`);
+      res.write(`Number of students in SWE: ${data.sweStudents.length}. List: ${data.sweStudents.join(', ')}`);
+      res.end();
     })
     .catch((err) => {
-      res.setHeader('Content-Type', 'text/plain');
-      res.statu(500).set('Content-Type', 'text/plain');
-      res.send(`Error: ${err.message}`);
+      res.status(500).send(`Error: ${err.message}`);
     });
 });
+
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
+
 module.exports = app;
