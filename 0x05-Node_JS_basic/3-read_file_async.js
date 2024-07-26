@@ -12,44 +12,36 @@ const fs = require('fs');
 // List: LIST_OF_FIRSTNAMES CSV file can contain empty
 // lines (at the end) - and they are not a valid student!
 
-const countStudents = (path) => new Promise((resolve, reject) => {
-  fs.readFile(path, 'utf-8', (err, data) => {
-    if (err) {
-      reject(new Error('Cannot load database'));
-      return;
-    }
+const path = require('path');
 
-    const lines = data.split('\n').filter((line) => line.trim() !== '');
-    if (lines.length < 2) {
-      resolve('Number of students: 0');
-      return;
-    }
-
-    const studentsByField = {};
-    let totalStudents = 0;
-
-    for (let i = 1; i < lines.length; i += 1) {
-      const line = lines[i].trim();
-      const fields = line.split(',');
-
-      if (fields.length === 4) {
-        const [firstName, , , field] = fields;
-        totalStudents += 1;
-
-        if (!studentsByField[field]) {
-          studentsByField[field] = [];
-        }
-        studentsByField[field].push(firstName);
+function countStudents(filePath) {
+  return new Promise((resolve, reject) => {
+    fs.readFile(filePath, 'utf8', (err, data) => {
+      if (err) {
+        reject(new Error('Cannot load the database'));
+        return;
       }
-    }
-    let output = `Number of students: ${totalStudents}\n`;
 
-    for (const [field, students] of Object.entries(studentsByField)) {
-        const fieldOutput = `Number of students in ${field}: ${students.length}. List: ${students.join(', ')}\n`;
-        output += fieldOutput;
-    }
-    resolve(output);
+      const students = data
+        .split('\n')
+        .filter((line) => line.trim() !== '' && !line.startsWith('firstname'))
+        .map((line) => {
+          const [firstname, lastname, age, field] = line.split(',');
+          return {
+            firstname: firstname.trim(), lastname: lastname.trim(), age: parseInt(age, 10), field: field.trim(),
+          };
+        });
+
+      const csStudents = students.filter((student) => student.field === 'CS').map((student) => student.firstname);
+      const sweStudents = students.filter((student) => student.field === 'SWE').map((student) => student.firstname);
+
+      resolve({
+        students,
+        csStudents,
+        sweStudents,
+      });
+    });
   });
-});
+}
 
 module.exports = countStudents;
