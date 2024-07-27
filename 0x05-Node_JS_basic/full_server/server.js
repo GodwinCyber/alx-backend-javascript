@@ -3,14 +3,14 @@
 // It should use the port 1245
 
 import express from 'express';
-import router from './routes/index';
+import mapRoutes from './routes';
+
 const app = express();
 const PORT = 1245;
 
-app.use('/', router);
-
+mapRoutes(app);
 app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
+  console.log(`Server listening on PORT ${PORT}`);
 });
 
 export default app;

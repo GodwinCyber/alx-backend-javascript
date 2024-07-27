@@ -6,29 +6,42 @@ import fs from 'fs';
 // When the file can be read, it should return an object of arrays of the
 // firstname of students per fields
 
-const readDatabase = async (filePath) => {
-    try {
-        if (!filePath) throw new Error('File path is required');
-
-        const data = await fs.readFile(filePath, 'utf8');
-        const lines = data.trim().split('\n');
-        const studentsByField = {};
-
-        lines.forEach((line, index) => {
-            const [firstName, field] = line.split(',');
-            if (index === 0) return; // Skip header line
-
-            if (!studentsByField[field]) {
-                studentsByField[field] = [];
-            }
-            studentsByField[field].push(firstName);
-        });
-
-        return studentsByField;
-    } catch (error) {
-        throw new Error('Cannot read the database file');
+const readDatabase = (dataPath) => new Promise((resolve, reject) => {
+    if (!dataPath) {
+      reject(new Error('Cannot load the database'));
     }
-};
+    if (dataPath) {
+      fs.readFile(dataPath, (err, data) => {
+        if (err) {
+          reject(new Error('Cannot load the database'));
+        }
+        if (data) {
+          const fileLines = data
+            .toString('utf-8')
+            .trim()
+            .split('\n');
+          const studentGroups = {};
+          const dbFieldNames = fileLines[0].split(',');
+          const studentPropNames = dbFieldNames
+            .slice(0, dbFieldNames.length - 1);
+  
+          for (const line of fileLines.slice(1)) {
+            const studentRecord = line.split(',');
+            const studentPropValues = studentRecord
+              .slice(0, studentRecord.length - 1);
+            const field = studentRecord[studentRecord.length - 1];
+            if (!Object.keys(studentGroups).includes(field)) {
+              studentGroups[field] = [];
+            }
+            const studentEntries = studentPropNames
+              .map((propName, idx) => [propName, studentPropValues[idx]]);
+            studentGroups[field].push(Object.fromEntries(studentEntries));
+          }
+          resolve(studentGroups);
+        }
+      });
+    }
+  });  
 
 export default readDatabase;
 module.exports = readDatabase;
